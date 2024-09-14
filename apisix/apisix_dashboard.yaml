@@ -1,0 +1,19 @@
+conf:
+  listen:
+    port: 9000
+  etcd:
+    endpoints:
+      - 'http://etcd:2379'
+    username: "root"
+    password: "your_secure_password"
+    prefix: '/apisix'
+
+authentication:
+  secret:
+    secret
+  expire_time: 3600
+  users:
+    - username: admin
+      password: admin
+    - username: user
+      password: user

@@ -1,2 +1,3 @@
-# api-management
-Test some API Management solutions
+# API Management
+
+Some simple tests of popular API Management solutions

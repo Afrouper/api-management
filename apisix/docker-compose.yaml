@@ -1,0 +1,95 @@
+services:
+  etcd:
+    image: bitnami/etcd:latest
+    container_name: etcd
+    environment:
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ROOT_PASSWORD: "your_secure_password"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+      ETCD_LISTEN_CLIENT_URLS0: http://0.0.0.0:2379"
+    networks:
+      - apisix-net
+    volumes:
+      - etcd-data:/bitnami/etcd
+
+  apisix-control:
+    image: apache/apisix:latest
+    container_name: apisix-control
+    environment:
+      APISIX_LOCAL_CONF: "/usr/local/apisix/conf/config.yaml"
+    ports:
+      - "9180:9180"  # Admin API
+      - "9280:9280"  # Configuration server for data plane
+    volumes:
+      - ./apisix_controlPlane.yaml:/usr/local/apisix/conf/config.yaml
+      - ./apisix-cluster.crt:/usr/local/apisix/certs/server.crt
+      - ./apisix-cluster.key:/usr/local/apisix/certs/server.key
+    networks:
+      - apisix-net
+    depends_on:
+      - etcd
+
+  apisix-data:
+    image: apache/apisix:latest
+    container_name: apisix-data
+    environment:
+      APISIX_NODE_NAME: "data-plane"
+      CONTROL_PLANE_HOST: "https://apisix-control:9280"
+      APISIX_LOCAL_CONF: "/usr/local/apisix/conf/config.yaml"
+    ports:
+      - "9080:9080"  # HTTP
+      - "9443:9443"  # HTTPS
+    volumes:
+      - ./apisix_dataPlane.yaml:/usr/local/apisix/conf/config.yaml
+      - ./apisix-cluster.crt:/usr/local/apisix/certs/server.crt
+      - ./apisix-cluster.key:/usr/local/apisix/certs/server.key
+    networks:
+      - apisix-net
+    depends_on:
+      - etcd
+
+  apisix-dashboard:
+    image: apache/apisix-dashboard:latest
+    container_name: apisix-dashboard
+    ports:
+      - "9000:9000"  # Dashboard UI
+    volumes:
+      - ./apisix_dashboard.yaml:/usr/local/apisix-dashboard/conf/conf.yaml
+    networks:
+      - apisix-net
+    depends_on:
+      - etcd
+
+  echo1:
+    image: afrouper/echo-service:latest
+    container_name: echo1
+    environment:
+      echo_service_port: "8081"
+      instance_name: "echo1"
+    networks:
+      - apisix-net
+
+  echo2:
+    image: afrouper/echo-service:latest
+    container_name: echo2
+    environment:
+      echo_service_port: "8082"
+      instance_name: "echo2"
+    networks:
+      - apisix-net
+
+  echo3:
+    image: afrouper/echo-service:latest
+    container_name: echo3
+    environment:
+      echo_service_port: "8083"
+      instance_name: "echo3"
+    networks:
+      - apisix-net
+
+networks:
+  apisix-net:
+    driver: bridge
+
+volumes:
+  etcd-data:
