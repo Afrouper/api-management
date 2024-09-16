@@ -2,7 +2,7 @@
 
 services:
   kong-database:
-    image: postgres:13
+    image: postgres:16
     container_name: kong-database
     environment:
       POSTGRES_USER: kong
@@ -47,12 +47,11 @@ services:
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_ADMIN_GUI_URL: http://localhost:8002
     ports:
-#      - "8000:8000"  # Proxy
-#      - "8443:8443"  # Proxy SSL
       - "8005:8005"  # Cluster communication
       - "8001:8001"  # Admin API
       - "8444:8444"  # Admin API SSL
       - "8002:8002"  # Kong Manager UI
+      - "8445:8445"  # Kong Manager UI SSL
     volumes:
       - ./kong-cluster.crt:/etc/kong/certs/kong-cluster.crt
       - ./kong-cluster.key:/etc/kong/certs/kong-cluster.key
@@ -82,28 +81,79 @@ services:
     depends_on:
       - kong-control-plane
 
-#  konga:
-#    image: pantsel/konga:latest
-#    container_name: konga
-#    environment:
-#      DB_ADAPTER: postgres
-#      DB_HOST: kong-database
-#      DB_USER: kong
-#      DB_PASSWORD: kongpass
-#      DB_DATABASE: kong
-#    ports:
-#      - "1337:1337"  # Konga UI
-#    networks:
-#      - kong-net
-#    depends_on:
-#      - kong-control-plane
-#      - kong-database
+  keycloak-database:
+    image: postgres:16
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    networks:
+      - keycloak_network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT_BACKCHANNEL: false
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-database/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    ports:
+      - 8080:8080
+    restart: always
+    depends_on:
+      - keycloak-database
+    networks:
+      - keycloak_network
+      - kong-net
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+    depends_on:
+      - kong-control-plane
+    networks:
+      - kong-net
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - kong-net
 
   echo1:
     image: afrouper/echo-service:latest
     container_name: echo1
     environment:
-      echo_service_port: "8080"
+      echo_service_port: "8081"
       instance_name: "echo1"
     networks:
       - kong-net
@@ -112,7 +162,7 @@ services:
     image: afrouper/echo-service:latest
     container_name: echo2
     environment:
-      echo_service_port: "8081"
+      echo_service_port: "8082"
       instance_name: "echo2"
     networks:
       - kong-net
@@ -121,7 +171,7 @@ services:
     image: afrouper/echo-service:latest
     container_name: echo3
     environment:
-      echo_service_port: "8082"
+      echo_service_port: "8083"
       instance_name: "echo3"
     networks:
       - kong-net
@@ -129,6 +179,10 @@ services:
 networks:
   kong-net:
     driver: bridge
+  keycloak_network:
+    driver: bridge
 
 volumes:
   kong-data:
+  prom_data:
+  postgres_keycloak_data:
