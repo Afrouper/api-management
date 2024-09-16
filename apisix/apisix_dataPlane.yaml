@@ -4,24 +4,13 @@ apisix:
   ssl:
     listen_port: 9443  # Port for HTTPS
 
-
-
 deployment:
   role: data_plane
   role_data_plane:
     config_provider: etcd
-    control_plane:
-      host:
-        - "https://apisix-control:9280"
-      timeout: 30
-	  prefix: /apisix
-  certs:
-    cert: /usr/local/apisix/certs/server.crt
-    cert_key: /usr/local/apisix/certs/server.key
 
   etcd:
     host:
       - 'http://etcd:2379'
     prefix: /apisix
     username: "root"
-    password: "your_secure_password"

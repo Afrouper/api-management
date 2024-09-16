@@ -4,9 +4,7 @@ services:
     container_name: etcd
     environment:
       ALLOW_NONE_AUTHENTICATION: "yes"
-      ETCD_ROOT_PASSWORD: "your_secure_password"
       ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
-      ETCD_LISTEN_CLIENT_URLS0: http://0.0.0.0:2379"
     networks:
       - apisix-net
     volumes:
@@ -62,7 +60,6 @@ services:
 
   echo1:
     image: afrouper/echo-service:latest
-    container_name: echo1
     environment:
       echo_service_port: "8081"
       instance_name: "echo1"
@@ -71,7 +68,6 @@ services:
 
   echo2:
     image: afrouper/echo-service:latest
-    container_name: echo2
     environment:
       echo_service_port: "8082"
       instance_name: "echo2"
@@ -80,7 +76,6 @@ services:
 
   echo3:
     image: afrouper/echo-service:latest
-    container_name: echo3
     environment:
       echo_service_port: "8083"
       instance_name: "echo3"
