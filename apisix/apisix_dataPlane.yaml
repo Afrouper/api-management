@@ -13,5 +13,5 @@ deployment:
     host:
       - http://etcd:2379
     prefix: /apisix
-    username: root
+    user: root
     password: your_secure_password

@@ -36,4 +36,9 @@ Some simple tests of popular API Management solutions as docker-compose runtimes
 ### Run
 * Change to folder `apisix`
 * execute `podman compose up -d` to start environment
-* Access [AdminUI](http://localhost:9000)
+* Create/Change Configuration
+  * Create services and routes with admin api calls in `admin_api.rest`
+  * Access [AdminUI](http://localhost:9000)
+* Call Services
+  * [Simple echo](http://localhost:9080/echo)
+  * [RoundRobin Test](http://localhost:9080/all)
