@@ -4,6 +4,7 @@ services:
     container_name: etcd
     environment:
       ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ROOT_PASSWORD: "your_secure_password"
       ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
     networks:
       - apisix-net
@@ -17,11 +18,8 @@ services:
       APISIX_LOCAL_CONF: "/usr/local/apisix/conf/config.yaml"
     ports:
       - "9180:9180"  # Admin API
-      - "9280:9280"  # Configuration server for data plane
     volumes:
       - ./apisix_controlPlane.yaml:/usr/local/apisix/conf/config.yaml
-      - ./apisix-cluster.crt:/usr/local/apisix/certs/server.crt
-      - ./apisix-cluster.key:/usr/local/apisix/certs/server.key
     networks:
       - apisix-net
     depends_on:
@@ -31,16 +29,12 @@ services:
     image: apache/apisix:latest
     container_name: apisix-data
     environment:
-      APISIX_NODE_NAME: "data-plane"
-      CONTROL_PLANE_HOST: "https://apisix-control:9280"
       APISIX_LOCAL_CONF: "/usr/local/apisix/conf/config.yaml"
     ports:
       - "9080:9080"  # HTTP
       - "9443:9443"  # HTTPS
     volumes:
       - ./apisix_dataPlane.yaml:/usr/local/apisix/conf/config.yaml
-      - ./apisix-cluster.crt:/usr/local/apisix/certs/server.crt
-      - ./apisix-cluster.key:/usr/local/apisix/certs/server.key
     networks:
       - apisix-net
     depends_on:

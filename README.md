@@ -35,6 +35,5 @@ Some simple tests of popular API Management solutions as docker-compose runtimes
 
 ### Run
 * Change to folder `apisix`
-* execute `createClusterCert.sh` to create certifcates
 * execute `podman compose up -d` to start environment
 * Access [AdminUI](http://localhost:9000)

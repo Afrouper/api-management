@@ -3,9 +3,10 @@ conf:
     port: 9000
   etcd:
     endpoints:
-      - 'http://etcd:2379'
-    username: "root"
-    prefix: '/apisix'
+      - http://etcd:2379
+    username: root
+    password: your_secure_password
+    prefix: /apisix
 
 authentication:
   secret:
