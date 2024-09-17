@@ -147,6 +147,20 @@ services:
     networks:
       - kong-net
 
+  consul:
+    image: bitnami/consul:latest
+    networks:
+      - kong-net
+    ports:
+      - '8300:8300'
+      - '8301:8301'
+      - '8301:8301/udp'
+      - '8500:8500'
+      - '8600:8600'
+      - '8600:8600/udp'
+    volumes:
+      - 'consul_data:/bitnami'
+
   echo1:
     image: afrouper/echo-service:latest
     container_name: echo1
@@ -184,3 +198,4 @@ volumes:
   kong-data:
   prom_data:
   postgres_keycloak_data:
+  consul_data:
