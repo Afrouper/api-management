@@ -8,10 +8,14 @@ deployment:
     config_provider: etcd
   etcd:
     host:
-    - http://etcd:2379
+    - https://etcd:2379
     prefix: /apisix
     user: root
     password: your_secure_password
+    tls:
+      cert: /usr/local/apisix/certs/client.crt
+      key: /usr/local/apisix/certs/client.key
+      trusted_ca_cert: /usr/local/apisix/certs/ca.crt
 
   admin:
     admin_key_required: true

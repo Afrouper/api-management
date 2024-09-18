@@ -3,10 +3,14 @@ conf:
     port: 9000            # The port on which the `Manager API` should listen.
   etcd:
     endpoints:            # supports defining multiple etcd host addresses for an etcd cluster
-      - http://etcd:2379
+      - https://etcd:2379
     prefix: /apisix       # apisix config's prefix in etcd, /apisix by default
     username: root
     password: your_secure_password
+    tls:
+      cert_file: /usr/local/apisix-dashboard/certs/client.crt
+      key_file: /usr/local/apisix-dashboard/certs/client.key
+      ca_file: /usr/local/apisix-dashboard/certs/ca.crt
   log:
     error_log:
       level: warn
