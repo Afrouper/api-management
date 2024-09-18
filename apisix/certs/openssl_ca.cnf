@@ -1,0 +1,23 @@
+[ req ]
+default_bits       = 4096
+prompt             = no
+default_md         = sha256
+distinguished_name = req_distinguished_name
+req_extensions     = v3_req
+
+[ req_distinguished_name ]
+C  = DE
+ST = Nowhere
+L  = Old Town
+O  = ACME
+CN = APIsix CA
+
+[ v3_req ]
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = apisix
+DNS.1 = apisix-control
+DNS.1 = apisix-data

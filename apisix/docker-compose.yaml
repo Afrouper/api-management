@@ -2,13 +2,18 @@ services:
   etcd:
     image: bitnami/etcd
     environment:
-      ALLOW_NONE_AUTHENTICATION: "yes"
       ETCD_ROOT_PASSWORD: "your_secure_password"
-      ETCD_ADVERTISE_CLIENT_URLS: "http://0.0.0.0:2379"
-      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+      ETCD_ADVERTISE_CLIENT_URLS: "https://etcd:2379"
+      ETCD_LISTEN_CLIENT_URLS: "https://0.0.0.0:2379"
+      ETCD_CLIENT_CERT_AUTH: "true"
+      ETCD_CERT_FILE: "/opt/bitnami/etcd/certs/etcd.crt"
+      ETCD_KEY_FILE: "/opt/bitnami/etcd/certs/etcd.key"
+      ETCD_TRUSTED_CA_FILE: "/opt/bitnami/etcd/certs/ca.crt"
+      ETCD_LOG_LEVEL: "debug"
     networks:
       - apisix-net
     volumes:
+      - ./certs:/opt/bitnami/etcd/certs
       - etcd-data:/bitnami/etcd
 
   apisix-control:
@@ -19,6 +24,7 @@ services:
       - "9180:9180"  # Admin API
     volumes:
       - ./apisix_controlPlane.yaml:/usr/local/apisix/conf/config.yaml
+      - ./certs:/usr/local/apisix/certs
     networks:
       - apisix-net
     depends_on:
@@ -33,6 +39,7 @@ services:
       - "9443:9443"  # HTTPS
     volumes:
       - ./apisix_dataPlane.yaml:/usr/local/apisix/conf/config.yaml
+      - ./certs:/usr/local/apisix/certs
     networks:
       - apisix-net
     depends_on:
@@ -44,6 +51,7 @@ services:
       - "9000:9000"
     volumes:
       - ./apisix_dashboard.yaml:/usr/local/apisix-dashboard/conf/conf.yaml
+      - ./certs:/usr/local/apisix-dashboard/certs
     networks:
       - apisix-net
     depends_on:

@@ -34,3 +34,5 @@ nb-configuration.xml
 # Keys
 *.key
 *.crt
+*.pem
+*.srl

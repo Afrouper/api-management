@@ -8,17 +8,22 @@ deployment:
     config_provider: etcd
   etcd:
     host:
-    - http://etcd:2379
+    - https://etcd:2379
+    prefix: /apisix
     user: root
     password: your_secure_password
-    prefix: /apisix
+    tls:
+      cert: /usr/local/apisix/certs/client.crt
+      key: /usr/local/apisix/certs/client.key
+      trusted_ca_cert: /usr/local/apisix/certs/ca.crt
+
   admin:
     admin_key_required: true
     enable_admin_cors: true
     admin_listen:
       ip: 0.0.0.0
       port: 9180
-    allow_admin:                  # Limit Admin API access by IP addresses.
+    allow_admin:
       - 127.0.0.0/24
       - 0.0.0.0/0
     admin_key:
