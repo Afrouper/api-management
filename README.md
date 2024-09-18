@@ -35,6 +35,7 @@ Some simple tests of popular API Management solutions as docker-compose runtimes
 
 ### Run
 * Change to folder `apisix`
+* Switch to folder `certs` and execute `createCustomCertificates.sh`
 * execute `podman compose up -d` to start environment
 * Create/Change Configuration
   * Create services and routes with admin api calls in `admin_api.rest`
